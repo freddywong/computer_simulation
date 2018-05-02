@@ -21,6 +21,7 @@
 
 require_relative 'memory'
 require_relative 'cpu'
+require './errors/computer/instruction_error'
 
 class Computer
   def initialize(memory_size)
@@ -34,6 +35,7 @@ class Computer
   end
 
   def insert(instruction, value=nil)
+    error_checkpoint(instruction)
     @memory[@cpu.program_counter] = input_data(instruction, value)
     @cpu.program_counter += 1
     self
@@ -50,6 +52,12 @@ class Computer
       { instruction: instruction, value: value }
     else
       { instruction: instruction }
+    end
+  end
+
+  def error_checkpoint(instruction)
+    if INSTRUCTIONS.key(instruction).nil?
+      raise InstructionError.new(instruction)
     end
   end
 end
