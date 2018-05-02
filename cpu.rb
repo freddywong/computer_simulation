@@ -16,8 +16,8 @@
 # => The process starts again with the Fetch Phase.
 
 require_relative 'instruction_table'
-require './errors/execute_error'
-require './errors/cpu_error'
+require './errors/cpu/execute_error'
+require './errors/cpu/cpu_error'
 
 class Cpu
   include InstructionTable
@@ -29,9 +29,15 @@ class Cpu
 
   def process(memory)
     @memory = memory
-    while instruction != 'STOP'
+    while instruction != INSTRUCTIONS[:stop]
       execute
-    end 
+    end
+  rescue => e
+    CpuError
+      .new(e, class_method: self.class, method: 'process', 
+        memory: @memory, program_counter: @program_counter)
+      .explain
+    exit  
   end
 
   private
@@ -42,20 +48,26 @@ class Cpu
 
   def execute
     case instruction
-    when 'PUSH'
+    when INSTRUCTIONS[:push]
       push
       increment_counter
-    when 'PRINT'
+    when INSTRUCTIONS[:print]
       show
       increment_counter
-    when 'CALL'
+    when INSTRUCTIONS[:call]
       call
-    when 'MULT'
+    when INSTRUCTIONS[:mult]
       mult
       increment_counter
-    when 'RET'
+    when INSTRUCTIONS[:ret]
       ret
     end
+  rescue => e
+    ExecuteError
+      .new(e, class_method: self.class, method: 'execute',
+        instruction: instruction, value: value)
+      .explain
+    exit
   end
 
   def instruction
