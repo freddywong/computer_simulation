@@ -22,4 +22,14 @@ def main
   computer.set_address(MAIN_BEGIN).execute()
 end
 
+## Used to test error messages:
+# def main
+  # computer = Computer.new(100)
+  # computer.insert("CALL", 3)
+  # computer.insert("PUSH", 3)
+  # computer.insert("PRINT")
+  # computer.insert("SCAN")
+  # computer.set_address(MAIN_BEGIN).execute()
+# end
+
 main()
