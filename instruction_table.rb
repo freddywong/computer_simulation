@@ -1,6 +1,15 @@
 ## DESCRIPTION ##
 # Instruction Table is used as a reference for the actions to be taken depending on the command
 
+INSTRUCTIONS = { 
+  push: 'PUSH', 
+  print: 'PRINT', 
+  call: 'CALL', 
+  mult: 'MULT', 
+  ret: 'RET',
+  stop: 'STOP'
+}.freeze
+
 module InstructionTable
   def push
     @memory.push({ value: value })
