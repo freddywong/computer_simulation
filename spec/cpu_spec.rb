@@ -19,16 +19,15 @@ RSpec.describe Cpu do
       end
     end
     context 'instruction is not STOP' do
+      let(:memory) { [{ instruction: 'PUSH', value: 4 }, { instruction: 'STOP' }] }
       xit 'calls execute' do
         # need to figure out how to test this without causing an infinite loop"
         # expect(cpu).to receive(:execute) causes an infinite loop
       end
       context 'instruction is PUSH' do
-        let(:memory) { [{ instruction: 'PUSH', value: 4 }, { instruction: 'STOP' }] }
-        it 'pushes instruction to memory' do
+        it 'executes instruction to #push' do
+          expect(cpu).to receive(:push)
           cpu.process(memory)
-          expect(cpu.instance_variable_get(:@memory))
-            .to eq([{ instruction: 'PUSH', value: 4 }, { instruction: 'STOP' }, { value: 4 }])
         end
         it 'increments the counter' do
           expect(cpu.instance_variable_get(:@program_counter)).to eq(0)
@@ -38,15 +37,9 @@ RSpec.describe Cpu do
       end
       context 'instruction is PRINT' do
         let(:memory) { [{ instruction: 'PRINT' }, { instruction: 'STOP' }, { value: 10 }] }
-        it 'pops the value from memory' do
+        it 'executes instruction to #show' do
+          expect(cpu).to receive(:show)
           cpu.process(memory)
-          expect(cpu.instance_variable_get(:@memory))
-            .to eq([{ instruction: 'PRINT' }, { instruction: 'STOP' }])
-        end
-        it 'prints out the popped value' do
-          expect do  
-            cpu.process(memory)
-          end.to output("10\n").to_stdout
         end
         it 'increments the counter' do
           expect(cpu.instance_variable_get(:@program_counter)).to eq(0)
@@ -55,7 +48,12 @@ RSpec.describe Cpu do
         end
       end
       context 'instruction is CALL' do
-        let(:memory) { [{ instruction: 'CALL', value: 3 }, nil, nil, { instruction: 'STOP' }] }
+        let(:memory) { [{ instruction: 'CALL', value: 3 }, nil, nil, { instruction: 'STOP' }, 
+          { instruction: 'PUSH', value: 5 }] }
+        it 'executes instruction to #call' do
+          expect(cpu).to receive(:call) { cpu.instance_variable_set(:@program_counter, 3) }
+          cpu.process(memory)
+        end
         it 'jumps to STOP address' do
           cpu.process(memory)
           expect(cpu.instance_variable_get(:@program_counter)).to eq(3)
@@ -64,11 +62,9 @@ RSpec.describe Cpu do
       context 'instruction is MULT' do
         let(:memory) { [{ instruction: 'PUSH', value: 4 }, { instruction: 'PUSH', value: 4 }, 
           { instruction: 'MULT' }, { instruction: 'STOP' }] }
-        it 'pops the last two values, multiples them and pushes to stack' do
+        it 'executes instruction to #mult' do
+          expect(cpu).to receive(:mult)
           cpu.process(memory)
-          expect(cpu.instance_variable_get(:@memory))
-            .to eq([{ instruction: 'PUSH', value: 4 }, { instruction: 'PUSH', value: 4 },
-            { instruction: 'MULT' }, { instruction: 'STOP' }, { value: 16 }])
         end
         it 'increments the counter' do
           expect(cpu.instance_variable_get(:@program_counter)).to eq(0)
@@ -77,16 +73,15 @@ RSpec.describe Cpu do
         end
       end
       context 'instruction is RET' do
-        let(:memory) { [{ instruction: 'RET' }, { instruction: 'STOP' }, { value: 1 }] }
-        it 'pops the last value' do
+        let(:memory) { [{ instruction: 'RET' }, nil, nil, { instruction: 'STOP' }, { value: 3 }] }
+        it 'executes instruction to #ret' do
+          expect(cpu).to receive(:ret) { cpu.instance_variable_set(:@program_counter, 3) }
           cpu.process(memory)
-          expect(cpu.instance_variable_get(:@memory))
-            .to eq([{ instruction: 'RET' }, { instruction: 'STOP' }])
         end
         it 'replaces the counter with the popped value' do
           expect(cpu.instance_variable_get(:@program_counter)).to eq(0)
           cpu.process(memory)
-          expect(cpu.instance_variable_get(:@program_counter)).to eq(1)
+          expect(cpu.instance_variable_get(:@program_counter)).to eq(3)
         end
       end
     end
