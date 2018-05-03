@@ -20,9 +20,9 @@ RSpec.describe Cpu do
     end
     context 'instruction is not STOP' do
       let(:memory) { [{ instruction: 'PUSH', value: 4 }, { instruction: 'STOP' }] }
-      xit 'calls execute' do
-        # need to figure out how to test this without causing an infinite loop"
-        # expect(cpu).to receive(:execute) causes an infinite loop
+      it 'calls execute' do
+        expect(cpu).to receive(:execute) { cpu.instance_variable_set(:@program_counter, 1) }
+        cpu.process(memory)
       end
       context 'instruction is PUSH' do
         it 'executes instruction to #push' do
