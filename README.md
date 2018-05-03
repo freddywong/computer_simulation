@@ -83,10 +83,6 @@ These two errors "prettify" the error message, providing useful debugging inform
 Another custom error, `InstructionError` is also raised in the case where an instruction is given to the computer during the insertion phase but is not recognized in the computer's instruction table.
 
 ## Todos
-### Tests
-**`spec/cpu_spec.rb` > `#execute`**
-- need to figure out how to test this without causing an infinite loop  
-`expect(cpu).to receive(:execute)` causes an infinite loop
 
 ### Comments
 **`app/main.rb`**
