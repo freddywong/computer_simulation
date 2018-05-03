@@ -21,15 +21,4 @@ class CpuError < StandardError
     """
     puts "#{variables}"
   end
-
-  private
-
-  def variables
-    """
-      ======== VARIABLES ========
-      MEMORY: #{@opts[:memory]}
-      PROGRAM COUNTER: #{@opts[:program_counter]}
-      MEMORY STORE: #{@opts[:memory_store]}
-    """
-  end
 end

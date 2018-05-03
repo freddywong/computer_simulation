@@ -17,7 +17,7 @@
 
 require_relative 'instruction_table'
 require './errors/cpu/execute_error'
-require './errors/cpu/cpu_error'
+require './errors/cpu/process_error'
 
 class Cpu
   include InstructionTable
@@ -32,19 +32,11 @@ class Cpu
     while instruction != INSTRUCTIONS[:stop]
       execute
     end
-  rescue => e
-    CpuError
-      .new(e, class_method: self.class, method: 'process', 
-        memory: @memory, program_counter: @program_counter)
-      .explain
-    exit  
+  rescue => @e
+    error_checkpoint('process')
   end
 
   private
-
-  def fetch
-    @memory[@program_counter]
-  end
 
   def execute
     case instruction
@@ -62,12 +54,12 @@ class Cpu
     when INSTRUCTIONS[:ret]
       ret
     end
-  rescue => e
-    ExecuteError
-      .new(e, class_method: self.class, method: 'execute',
-        instruction: instruction, value: value)
-      .explain
-    exit
+  rescue => @e  
+    error_checkpoint('execute')
+  end
+
+  def fetch
+    @memory[@program_counter]
   end
 
   def instruction
@@ -80,5 +72,22 @@ class Cpu
 
   def increment_counter
     @program_counter += 1
+  end
+
+  def error_checkpoint(type)
+    case type
+    when 'process'      
+      ProcessError
+        .new(@e, class_method: self.class, method: 'process', 
+          memory: @memory, program_counter: @program_counter)
+        .explain
+      exit 
+    when 'execute'
+      ExecuteError
+        .new(@e, class_method: self.class, method: 'execute',
+          instruction: instruction, value: value)
+        .explain
+      exit
+    end
   end
 end
