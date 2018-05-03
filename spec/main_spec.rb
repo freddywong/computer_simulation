@@ -1,4 +1,4 @@
-require "./main"
+require "./app/main"
 require 'spec_helper'
 
 describe '#main' do

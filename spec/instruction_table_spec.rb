@@ -1,4 +1,4 @@
-require "./cpu"
+require "./app/cpu"
 require 'spec_helper'
 
 RSpec.describe InstructionTable do

@@ -1,4 +1,4 @@
-require "./memory"
+require "./app/memory"
 require 'spec_helper'
 
 RSpec.describe Memory do

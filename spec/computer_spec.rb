@@ -1,4 +1,4 @@
-require "./computer"
+require "./app/computer"
 require 'spec_helper'
 
 RSpec.describe Computer do
